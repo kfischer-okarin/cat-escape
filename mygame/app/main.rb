@@ -2,11 +2,12 @@ require 'app/movement'
 
 STAGE = <<~STAGE.freeze
   XXXXXXXXXX
-  XC       X
+  XCB      X
   XXXXXXXXXX
 STAGE
 
 COLORS = {
+  black: { r: 0, g: 0, b: 0 },
   orange: { r: 223, g: 113, b: 38 }
 }.transform_values(&:freeze).freeze
 
@@ -22,6 +23,16 @@ def tick(args)
 
   args.outputs.background_color = { r: 100, g: 100, b: 100 }
   args.outputs.primitives << args.state.stage[:sprites]
+  args.outputs.primitives << args.state.stage[:objects].map { |object|
+    {
+      x: (object[:x] * CELL_SIZE) + args.state.stage[:offset_x] + object[:sprite_offset_x],
+      y: (object[:y] * CELL_SIZE) + args.state.stage[:offset_y] + object[:sprite_offset_y],
+      w: CELL_SIZE,
+      h: CELL_SIZE,
+      path: 'sprites/box.png',
+      **COLORS[:black]
+    }
+  }
   args.outputs.primitives << args.state.stage[:cats].map { |cat|
     {
       x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x] + cat[:sprite_offset_x],
@@ -86,6 +97,7 @@ def prepare_stage(stage)
 
   result = {
     cats: [],
+    objects: [],
     columns: columns,
     rows: rows,
     cells: [],
@@ -118,6 +130,8 @@ def prepare_stage(stage)
       case object_type
       when :cat
         result[:cats] << { x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
+      when :box
+        result[:objects] << { type: object_type, x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
       end
     end
   end
@@ -139,7 +153,8 @@ def cell_sprite(cell_type)
 end
 
 OBJECT_SYMBOLS = {
-  'C' => :cat
+  'C' => :cat,
+  'B' => :box
 }.freeze
 
 def update_animations(args)
