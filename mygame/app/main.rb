@@ -12,17 +12,20 @@ COLORS = {
 
 def tick(args)
   args.state.stage ||= prepare_stage(STAGE)
+  args.state.animations ||= []
 
   input_event = process_input(args)
 
-  handle_input(args, input_event) if input_event
+  handle_input(args, input_event) if input_event && args.state.animations.empty?
+
+  update_animations(args)
 
   args.outputs.background_color = { r: 100, g: 100, b: 100 }
   args.outputs.primitives << args.state.stage[:sprites]
   args.outputs.primitives << args.state.stage[:cats].map { |cat|
     {
-      x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x],
-      y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y],
+      x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x] + cat[:sprite_offset_x],
+      y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
       w: CELL_SIZE,
       h: CELL_SIZE,
       path: 'sprites/cat.png',
@@ -54,8 +57,15 @@ def handle_input(args, input_event)
     movement_results.each do |result|
       case result[:type]
       when :cat_moved
-        args.state.stage[:cats][0][:x] = result[:to][:x]
-        args.state.stage[:cats][0][:y] = result[:to][:y]
+        cat_index = result[:cat]
+        cat = args.state.stage[:cats][cat_index]
+        args.state.animations << {
+          type: :move,
+          target: cat,
+          ticks: 0,
+          finished: false,
+          direction: input_event[:direction].dup
+        }
       end
     end
   end
@@ -107,7 +117,7 @@ def prepare_stage(stage)
       object_type = OBJECT_SYMBOLS[cell_symbol]
       case object_type
       when :cat
-        result[:cats] << { x: x, y: y }
+        result[:cats] << { x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
       end
     end
   end
@@ -131,3 +141,27 @@ end
 OBJECT_SYMBOLS = {
   'C' => :cat
 }.freeze
+
+def update_animations(args)
+  args.state.animations.each do |animation|
+    case animation[:type]
+    when :move
+      target = animation[:target]
+      animation[:ticks] += 1
+      duration = 20
+      factor = Easing.smooth_step(start_at: 0, end_at: duration, tick_count: animation[:ticks], power: 2)
+      if animation[:ticks] == duration
+        target[:sprite_offset_x] = 0
+        target[:sprite_offset_y] = 0
+        target[:x] += animation[:direction][:x]
+        target[:y] += animation[:direction][:y]
+        animation[:finished] = true
+      else
+        target[:sprite_offset_x] = (animation[:direction][:x] * CELL_SIZE * factor).floor
+        target[:sprite_offset_y] = (animation[:direction][:y] * CELL_SIZE * factor).floor
+      end
+    end
+  end
+
+  args.state.animations.reject! { |animation| animation[:finished] }
+end
