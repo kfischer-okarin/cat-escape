@@ -6,11 +6,25 @@ STAGE = <<~STAGE.freeze
   XXXXXXXXXX
 STAGE
 
+COLORS = {
+  orange: { r: 223, g: 113, b: 38 }
+}.transform_values(&:freeze).freeze
+
 def tick(args)
   args.state.stage ||= prepare_stage(STAGE)
 
   args.outputs.background_color = { r: 100, g: 100, b: 100 }
   args.outputs.primitives << args.state.stage[:sprites]
+  args.outputs.primitives << args.state.stage[:cats].map { |cat|
+    {
+      x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x],
+      y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y],
+      w: CELL_SIZE,
+      h: CELL_SIZE,
+      path: 'sprites/cat.png',
+      **COLORS[:orange]
+    }
+  }
 
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
 end
