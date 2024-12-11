@@ -13,6 +13,10 @@ COLORS = {
 def tick(args)
   args.state.stage ||= prepare_stage(STAGE)
 
+  input_event = process_input(args)
+
+  handle_input(args, input_event) if input_event
+
   args.outputs.background_color = { r: 100, g: 100, b: 100 }
   args.outputs.primitives << args.state.stage[:sprites]
   args.outputs.primitives << args.state.stage[:cats].map { |cat|
@@ -27,6 +31,34 @@ def tick(args)
   }
 
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
+end
+
+def process_input(args)
+  key_down = args.inputs.keyboard.key_down
+  if key_down.up
+    { type: :move, direction: { x: 0, y: 1 } }
+  elsif key_down.down
+    { type: :move, direction: { x: 0, y: -1 } }
+  elsif key_down.left
+    { type: :move, direction: { x: -1, y: 0 } }
+  elsif key_down.right
+    { type: :move, direction: { x: 1, y: 0 } }
+  end
+end
+
+def handle_input(args, input_event)
+  case input_event[:type]
+  when :move
+    movement_results = try_to_move_cat(args.state.stage, cat: 0, direction: input_event[:direction])
+
+    movement_results.each do |result|
+      case result[:type]
+      when :cat_moved
+        args.state.stage[:cats][0][:x] = result[:to][:x]
+        args.state.stage[:cats][0][:y] = result[:to][:y]
+      end
+    end
+  end
 end
 
 CELL_SIZE = 64
