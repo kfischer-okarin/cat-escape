@@ -1,3 +1,5 @@
+require 'app/movement'
+
 STAGE = <<~STAGE.freeze
   XXXXXXXXXX
   XC       X
