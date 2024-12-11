@@ -7,11 +7,8 @@ STAGE
 def tick(args)
   args.state.stage ||= prepare_stage(STAGE)
 
-  args.outputs.primitives << args.state.stage[:cells].flat_map { |column|
-    column.map { |cell|
-      cell[:sprite]
-    }
-  }
+  args.outputs.background_color = { r: 100, g: 100, b: 100 }
+  args.outputs.primitives << args.state.stage[:sprites]
 
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
 end
@@ -29,38 +26,50 @@ def prepare_stage(stage)
   offset_x = (1280 - (columns * CELL_SIZE)).idiv(2)
   offset_y = (720 - (rows * CELL_SIZE)).idiv(2)
 
-  cells = (0...columns).map { |col|
-    column = stage_data[col]
-    x = (col * CELL_SIZE) + offset_x
+  stage_sprites = []
+  cells = []
+  columns.times do |col|
+    data_column = stage_data[col]
 
-    (0...rows).map { |row|
-      cell_type = column[row]
-      {
-        sprite: {
-          x: x,
-          y: (row * CELL_SIZE) + offset_y,
-          w: CELL_SIZE,
-          h: CELL_SIZE,
-          **cell_sprite(cell_type)
-        }
+    cell_column = []
+    cells << cell_column
+
+    rows.times do |row|
+      cell_type_symbol = data_column[row]
+      cell_type = CELL_TYPE_SYMBOLS[cell_type_symbol]
+
+      cell_column << cell_type
+
+      stage_sprites << {
+        x: (col * CELL_SIZE) + offset_x,
+        y: (row * CELL_SIZE) + offset_y,
+        w: CELL_SIZE,
+        h: CELL_SIZE,
+        **cell_sprite(cell_type)
       }
-    }
-  }
+    end
+  end
 
   {
     columns: columns,
     rows: rows,
     cells: cells,
+    sprites: stage_sprites,
     offset_x: offset_x,
     offset_y: offset_y
   }
 end
 
+CELL_TYPE_SYMBOLS = {
+  'X' => :wall,
+  ' ' => :empty
+}.freeze
+
 def cell_sprite(cell_type)
   case cell_type
-  when 'X'
+  when :wall
     { path: :pixel, r: 100, g: 100, b: 100 }
-  when ' '
+  when :empty
     { path: :pixel, r: 255, g: 255, b: 255 }
   end
 end
