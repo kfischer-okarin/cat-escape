@@ -77,6 +77,17 @@ def handle_input(args, input_event)
           finished: false,
           direction: input_event[:direction].dup
         }
+      when :box_moved
+        box = args.state.stage[:objects].find { |object|
+          object[:x] == result[:from][:x] && object[:y] == result[:from][:y]
+        }
+        args.state.animations << {
+          type: :move,
+          target: box,
+          ticks: 0,
+          finished: false,
+          direction: input_event[:direction].dup
+        }
       end
     end
   end

@@ -49,4 +49,48 @@ describe 'moving a cat' do
     }
     assert.includes! result, expected
   end
+
+  it 'can push a box into an empty cell' do
+    stage = prepare_stage(<<~STAGE)
+      XXXXX
+      XCB X
+      XXXXX
+    STAGE
+
+    result = try_to_move_cat(stage, cat: 0, direction: { x: 1, y: 0 })
+
+    expected1 = {
+      type: :cat_moved,
+      cat: 0,
+      from: { x: 1, y: 1 },
+      to: { x: 2, y: 1 }
+    }
+    assert.includes! result, expected1
+    expected2 = {
+      type: :box_moved,
+      from: { x: 2, y: 1 },
+      to: { x: 3, y: 1 }
+    }
+    assert.includes! result, expected2
+  end
+
+  it 'cannot push a box into a wall' do
+    stage = prepare_stage(<<~STAGE)
+      XXXX
+      XCBX
+      XXXX
+    STAGE
+
+    result = try_to_move_cat(stage, cat: 0, direction: { x: 1, y: 0 })
+
+    expected = {
+      type: :cat_bumped_into_box,
+      cat: 0,
+      from: { x: 1, y: 1 },
+      to: { x: 2, y: 1 }
+    }
+    assert.includes! result, expected
+    event_types = result.map { |event| event[:type] }
+    assert.includes_no! event_types, :box_moved
+  end
 end
