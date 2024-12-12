@@ -19,15 +19,14 @@ describe 'moving a cat' do
   ].each do |direction|
     it "can move into an empty cell #{direction}" do
       stage = prepare_plus_stage
-      original_position = stage[:cats][0].dup
 
       result = try_to_move_cat(stage, cat: 0, direction: direction)
 
       expected = {
         type: :cat_moved,
         cat: 0,
-        from: original_position,
-        to: { x: original_position[:x] + direction[:x], y: original_position[:y] + direction[:y] }
+        from: { x: 2, y: 2 },
+        to: { x: 2 + direction[:x], y: 2 + direction[:y] }
       }
       assert.includes! result, expected
     end
@@ -39,15 +38,14 @@ describe 'moving a cat' do
       XCX
       XXX
     STAGE
-    original_position = stage[:cats][0].dup
 
     result = try_to_move_cat(stage, cat: 0, direction: { x: 0, y: 1 })
 
     expected = {
       type: :cat_bumped_into_wall,
       cat: 0,
-      from: original_position,
-      to: { x: original_position[:x], y: original_position[:y] + 1 }
+      from: { x: 1, y: 1 },
+      to: { x: 1, y: 2 }
     }
     assert.includes! result, expected
   end
