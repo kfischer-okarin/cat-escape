@@ -39,8 +39,7 @@ def tick(args)
       y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
       w: CELL_SIZE,
       h: CELL_SIZE,
-      path: 'sprites/cat.png',
-      **COLORS[:orange]
+      path: 'sprites/cat.png'
     }
   }
 
