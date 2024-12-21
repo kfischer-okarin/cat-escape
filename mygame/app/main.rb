@@ -98,32 +98,20 @@ def handle_input(args, input_event)
       case result[:type]
       when :cat_moved
         cat = get_cat(args, result[:cat])
-        args.state.animations << {
-          type: :move,
-          target: cat,
-          ticks: 0,
-          finished: false,
-          direction: input_event[:direction].dup
-        }
+        args.state.animations << build_animation(type: :move, target: cat, direction: input_event[:direction])
         update_cat_facing_direction(cat, input_event[:direction])
       when :box_moved
         box = args.state.stage[:objects].find { |object|
           object[:x] == result[:from][:x] && object[:y] == result[:from][:y]
         }
-        args.state.animations << {
-          type: :move,
-          target: box,
-          ticks: 0,
-          finished: false,
-          direction: input_event[:direction].dup
-        }
+        args.state.animations << build_animation(type: :move, target: box, direction: input_event[:direction])
       end
     end
   when :switch_cat
     args.state.current_cat = (args.state.current_cat + 1) % args.state.stage[:cats].size
     args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
     cat = get_cat(args, args.state.current_cat)
-    args.state.animations << { type: :cat_selected, ticks: 0, target: cat }
+    args.state.animations << build_animation(type: :cat_selected, target: cat)
   end
 end
 
@@ -217,6 +205,10 @@ OBJECT_SYMBOLS = {
   'C' => :cat,
   'B' => :box
 }.freeze
+
+def build_animation(values)
+  values.merge(ticks: 0, finished: false)
+end
 
 def update_animations(args)
   args.state.animations.each do |animation|
