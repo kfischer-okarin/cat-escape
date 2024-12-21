@@ -37,6 +37,20 @@ module Animation
       end
     end
 
+    def handle_canceled_move_animation(animation)
+      target = animation[:target]
+      duration = 20
+      factor = parabol_easing(animation[:ticks], duration)
+      if animation[:ticks] == duration
+        target[:sprite_offset_x] = 0
+        target[:sprite_offset_y] = 0
+        animation[:finished] = true
+      else
+        target[:sprite_offset_x] = (animation[:direction][:x] * CELL_SIZE * factor * 0.3).floor
+        target[:sprite_offset_y] = (animation[:direction][:y] * CELL_SIZE * factor * 0.3).floor
+      end
+    end
+
     def handle_cat_selected_animation(animation)
       target = animation[:target]
       duration = 20
