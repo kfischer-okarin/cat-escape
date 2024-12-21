@@ -2,7 +2,7 @@ require 'app/movement'
 
 STAGE = <<~STAGE.freeze
   XXXXXXXXXX
-  XCB      X
+  XCB   C  X
   XXXXXXXXXX
 STAGE
 
@@ -29,17 +29,16 @@ def tick(args)
       y: (object[:y] * CELL_SIZE) + args.state.stage[:offset_y] + object[:sprite_offset_y],
       w: CELL_SIZE,
       h: CELL_SIZE,
-      path: 'sprites/box.png',
-      **COLORS[:black]
+      path: 'sprites/crate_42.png',
     }
   }
-  args.outputs.primitives << args.state.stage[:cats].map { |cat|
+  args.outputs.primitives << args.state.stage[:cats].map_with_index { |cat, index|
     {
       x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x] + cat[:sprite_offset_x],
       y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
       w: CELL_SIZE,
       h: CELL_SIZE,
-      path: 'sprites/cat.png'
+      path: ['sprites/cat.png', 'sprites/tuxedo-cat.png'][index]
     }
   }
 
@@ -158,7 +157,7 @@ def cell_sprite(cell_type)
   when :wall
     { path: :pixel, r: 100, g: 100, b: 100 }
   else
-    { path: :pixel, r: 255, g: 255, b: 255 }
+    { path: 'sprites/ground_06.png' }
   end
 end
 
