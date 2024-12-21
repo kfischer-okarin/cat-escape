@@ -56,6 +56,7 @@ def tick(args)
       w: cat[:w],
       h: cat[:h],
       path: CAT_SPRITES[index],
+      flip_horizontally: !cat[:facing_right],
       **color
     }
   }
@@ -104,6 +105,12 @@ def handle_input(args, input_event)
           finished: false,
           direction: input_event[:direction].dup
         }
+        direction_x = input_event[:direction][:x]
+        if direction_x.positive?
+          cat[:facing_right] = true
+        elsif direction_x.negative?
+          cat[:facing_right] = false
+        end
       when :box_moved
         box = args.state.stage[:objects].find { |object|
           object[:x] == result[:from][:x] && object[:y] == result[:from][:y]
@@ -176,7 +183,11 @@ def prepare_stage(stage)
       object_type = OBJECT_SYMBOLS[cell_symbol]
       case object_type
       when :cat
-        result[:cats] << { x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0, w: CELL_SIZE, h: CELL_SIZE }
+        result[:cats] << {
+          x: x, y: y,
+          sprite_offset_x: 0, sprite_offset_y: 0, w: CELL_SIZE, h: CELL_SIZE,
+          facing_right: true
+        }
       when :box
         result[:objects] << { type: object_type, x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
       end
