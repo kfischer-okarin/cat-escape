@@ -21,6 +21,9 @@ COLORS = {
 # Meow sounds by freesound_community from Pixabay
 # https://pixabay.com/sound-effects/tom-cat-meow-27989/
 
+# Angry cat sounds by freesound_community from Pixabay
+# https://pixabay.com/sound-effects/very-angry-cat-101289/
+
 CAT_SPRITES = [
   'sprites/cat.png',
   'sprites/tuxedo-cat.png'
