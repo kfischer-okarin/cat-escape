@@ -43,8 +43,8 @@ def tick(args)
     {
       x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x] + cat[:sprite_offset_x],
       y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
-      w: CELL_SIZE,
-      h: CELL_SIZE,
+      w: cat[:w],
+      h: cat[:h],
       path: CAT_SPRITES[index],
     }
   }
@@ -109,6 +109,8 @@ def handle_input(args, input_event)
   when :switch_cat
     args.state.current_cat = (args.state.current_cat + 1) % args.state.stage[:cats].size
     args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
+    cat = get_cat(args, args.state.current_cat)
+    args.state.animations << { type: :cat_selected, ticks: 0, target: cat }
   end
 end
 
@@ -163,7 +165,7 @@ def prepare_stage(stage)
       object_type = OBJECT_SYMBOLS[cell_symbol]
       case object_type
       when :cat
-        result[:cats] << { x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
+        result[:cats] << { x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0, w: CELL_SIZE, h: CELL_SIZE }
       when :box
         result[:objects] << { type: object_type, x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
       end
@@ -209,10 +211,31 @@ def update_animations(args)
         target[:sprite_offset_x] = (animation[:direction][:x] * CELL_SIZE * factor).floor
         target[:sprite_offset_y] = (animation[:direction][:y] * CELL_SIZE * factor).floor
       end
+    when :cat_selected
+      target = animation[:target]
+      animation[:ticks] += 1
+      duration = 20
+      factor = parabol_easing(animation[:ticks], duration)
+      w = CELL_SIZE - (factor * 10).floor
+      h = CELL_SIZE + (factor * 10).floor
+      target[:sprite_offset_x] = (CELL_SIZE - w).idiv(2)
+      target[:w] = w
+      target[:h] = h
+      if animation[:ticks] == duration
+        target[:w] = CELL_SIZE
+        target[:h] = CELL_SIZE
+        target[:sprite_offset_x] = 0
+        animation[:finished] = true
+      end
     end
   end
 
   args.state.animations.reject! { |animation| animation[:finished] }
+end
+
+def parabol_easing(tick, duration)
+  t = tick / duration
+  4 * t * (1 - t)
 end
 
 def render_current_cat_portrait(args)
