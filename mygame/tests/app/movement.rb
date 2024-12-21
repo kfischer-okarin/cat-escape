@@ -92,6 +92,7 @@ describe 'moving a cat' do
     assert.includes! result, expected
     event_types = result.map { |event| event[:type] }
     assert.includes_no! event_types, :box_moved
+    assert.includes_no! event_types, :cat_moved
   end
 
   it 'cannot push a box into another box' do
@@ -112,5 +113,27 @@ describe 'moving a cat' do
     assert.includes! result, expected
     event_types = result.map { |event| event[:type] }
     assert.includes_no! event_types, :box_moved
+    assert.includes_no! event_types, :cat_moved
+  end
+
+  it 'cannot push a box into a cat' do
+    stage = prepare_stage(<<~STAGE)
+      XXXXX
+      XCBCX
+      XXXXX
+    STAGE
+
+    result = try_to_move_cat(stage, cat: 0, direction: { x: 1, y: 0 })
+
+    expected = {
+      type: :pushed_box_into_cat,
+      cat: 0,
+      from: { x: 2, y: 1 },
+      to: { x: 3, y: 1 }
+    }
+    assert.includes! result, expected
+    event_types = result.map { |event| event[:type] }
+    assert.includes_no! event_types, :box_moved
+    assert.includes_no! event_types, :cat_moved
   end
 end
