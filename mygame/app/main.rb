@@ -8,7 +8,9 @@ STAGE
 
 COLORS = {
   black: { r: 0, g: 0, b: 0 },
-  orange: { r: 223, g: 113, b: 38 }
+  orange: { r: 223, g: 113, b: 38 },
+  white: { r: 255, g: 255, b: 255 },
+  gray: { r: 100, g: 100, b: 100 }
 }.transform_values(&:freeze).freeze
 
 CAT_SPRITES = [
@@ -40,12 +42,14 @@ def tick(args)
     }
   }
   args.outputs.primitives << args.state.stage[:cats].map_with_index { |cat, index|
+    color = index == args.state.current_cat ? COLORS[:white] : COLORS[:gray]
     {
       x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x] + cat[:sprite_offset_x],
       y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
       w: cat[:w],
       h: cat[:h],
       path: CAT_SPRITES[index],
+      **color
     }
   }
 
