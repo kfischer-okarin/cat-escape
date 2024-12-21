@@ -24,6 +24,9 @@ COLORS = {
 # Angry cat sounds by freesound_community from Pixabay
 # https://pixabay.com/sound-effects/very-angry-cat-101289/
 
+# Box move sound by freesound_community from Pixabay
+# https://pixabay.com/sound-effects/chair-sliding-28432/
+
 CAT_SPRITES = [
   'sprites/cat.png',
   'sprites/tuxedo-cat.png'
