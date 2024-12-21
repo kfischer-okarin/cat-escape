@@ -14,6 +14,7 @@ COLORS = {
 def tick(args)
   setup(args) if args.state.tick_count == 0
   args.state.stage ||= prepare_stage(STAGE)
+  args.state.current_cat ||= 0
   args.state.animations ||= []
 
   input_event = process_input(args)
@@ -60,13 +61,19 @@ def process_input(args)
     { type: :move, direction: { x: -1, y: 0 } }
   elsif key_down.right
     { type: :move, direction: { x: 1, y: 0 } }
+  elsif key_down.tab
+    { type: :switch_cat }
   end
 end
 
 def handle_input(args, input_event)
   case input_event[:type]
   when :move
-    movement_results = try_to_move_cat(args.state.stage, cat: 0, direction: input_event[:direction])
+    movement_results = try_to_move_cat(
+      args.state.stage,
+      cat: args.state.current_cat,
+      direction: input_event[:direction]
+    )
 
     movement_results.each do |result|
       case result[:type]
@@ -93,6 +100,8 @@ def handle_input(args, input_event)
         }
       end
     end
+  when :switch_cat
+    args.state.current_cat = (args.state.current_cat + 1) % args.state.stage[:cats].size
   end
 end
 
