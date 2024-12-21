@@ -105,6 +105,7 @@ def handle_input(args, input_event)
         args.state.animations << Animation.build(type: :move, target: cat, direction: input_event[:direction])
         update_cat_facing_direction(cat, input_event[:direction])
       when :box_moved
+        args.audio[:box_moved] = { input: 'audio/move_box.wav', gain: 0.5 }
         args.state.animations << Animation.build(
           type: :move,
           target: find_object(args.state.stage, result[:from], type: :box),
