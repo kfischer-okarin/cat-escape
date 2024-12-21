@@ -11,6 +11,11 @@ COLORS = {
   orange: { r: 223, g: 113, b: 38 }
 }.transform_values(&:freeze).freeze
 
+CAT_SPRITES = [
+  'sprites/cat.png',
+  'sprites/tuxedo-cat.png'
+].freeze
+
 def tick(args)
   setup(args) if args.state.tick_count == 0
   args.state.stage ||= prepare_stage(STAGE)
@@ -40,9 +45,11 @@ def tick(args)
       y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
       w: CELL_SIZE,
       h: CELL_SIZE,
-      path: ['sprites/cat.png', 'sprites/tuxedo-cat.png'][index]
+      path: CAT_SPRITES[index],
     }
   }
+
+  render_current_cat_portrait(args)
 
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
 end
@@ -205,4 +212,21 @@ def update_animations(args)
   end
 
   args.state.animations.reject! { |animation| animation[:finished] }
+end
+
+def render_current_cat_portrait(args)
+  current_cat_sprite = CAT_SPRITES[args.state.current_cat]
+  source_w = 39
+  source_h = 30
+  args.outputs.primitives << {
+    x: 0,
+    y: 0,
+    w: source_w * 5,
+    h: source_h * 5,
+    path: current_cat_sprite,
+    source_x: 23,
+    source_y: 20,
+    source_w: source_w,
+    source_h: source_h
+  }
 end
