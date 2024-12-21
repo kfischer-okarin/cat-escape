@@ -48,7 +48,7 @@ def tick(args)
 end
 
 def setup(args)
-  args.audio[:bgm] = { input: 'Wholesome.ogg' }
+  args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true }
 end
 
 def process_input(args)
