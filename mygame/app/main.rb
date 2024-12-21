@@ -97,13 +97,14 @@ def handle_input(args, input_event)
       cat: args.state.current_cat,
       direction: input_event[:direction]
     )
+    cat = get_cat(args, args.state.current_cat)
+    update_cat_facing_direction(cat, input_event[:direction])
+
 
     movement_results.each do |result|
       case result[:type]
       when :cat_moved
-        cat = get_cat(args, result[:cat])
         args.state.animations << Animation.build(type: :move, target: cat, direction: input_event[:direction])
-        update_cat_facing_direction(cat, input_event[:direction])
       when :box_moved
         args.audio[:box_moved] = { input: 'audio/move_box.wav', gain: 0.5 }
         args.state.animations << Animation.build(
@@ -118,7 +119,7 @@ def handle_input(args, input_event)
         args.state.animations << Animation.build(type: :angry_cat, target: other_cat)
         args.state.animations << Animation.build(
           type: :canceled_move,
-          target: get_cat(args, result[:from_cat]),
+          target: cat,
           direction: input_event[:direction]
         )
         args.state.animations << Animation.build(
