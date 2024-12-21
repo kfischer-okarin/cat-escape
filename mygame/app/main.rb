@@ -102,10 +102,11 @@ def handle_input(args, input_event)
         args.state.animations << Animation.build(type: :move, target: cat, direction: input_event[:direction])
         update_cat_facing_direction(cat, input_event[:direction])
       when :box_moved
-        box = args.state.stage[:objects].find { |object|
-          object[:x] == result[:from][:x] && object[:y] == result[:from][:y]
-        }
-        args.state.animations << Animation.build(type: :move, target: box, direction: input_event[:direction])
+        args.state.animations << Animation.build(
+          type: :move,
+          target: find_object(args.state.stage, result[:from], type: :box),
+          direction: input_event[:direction]
+        )
       when :pushed_box_into_cat
         args.audio[:angry_cat] = { input: "audio/angry_cat#{rand(3) + 1}.wav" }
         other_cat = get_cat(args, result[:to_cat])
@@ -119,6 +120,12 @@ def handle_input(args, input_event)
     cat = get_cat(args, args.state.current_cat)
     args.state.animations << Animation.build(type: :cat_selected, target: cat)
   end
+end
+
+def find_object(stage, position, type: nil)
+  stage[:objects].find { |object|
+    object[:x] == position[:x] && object[:y] == position[:y] && (type.nil? || object[:type] == type)
+  }
 end
 
 def update_cat_facing_direction(cat, direction)
