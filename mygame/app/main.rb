@@ -108,6 +108,7 @@ def handle_input(args, input_event)
     end
   when :switch_cat
     args.state.current_cat = (args.state.current_cat + 1) % args.state.stage[:cats].size
+    args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
   end
 end
 
