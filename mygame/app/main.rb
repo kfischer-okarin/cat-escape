@@ -106,6 +106,11 @@ def handle_input(args, input_event)
           object[:x] == result[:from][:x] && object[:y] == result[:from][:y]
         }
         args.state.animations << Animation.build(type: :move, target: box, direction: input_event[:direction])
+      when :pushed_box_into_cat
+        args.audio[:angry_cat] = { input: "audio/angry_cat#{rand(3) + 1}.wav" }
+        other_cat = get_cat(args, result[:to_cat])
+        update_cat_facing_direction(other_cat, input_event[:direction].merge(x: -input_event[:direction][:x]))
+        args.state.animations << Animation.build(type: :angry_cat, target: other_cat)
       end
     end
   when :switch_cat

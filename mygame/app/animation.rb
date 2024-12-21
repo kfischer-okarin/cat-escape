@@ -54,6 +54,10 @@ module Animation
       animation[:finished] = true
     end
 
+    def handle_angry_cat_animation(animation)
+      handle_cat_selected_animation(animation)
+    end
+
     def parabol_easing(tick, duration)
       t = tick / duration
       4 * t * (1 - t)
