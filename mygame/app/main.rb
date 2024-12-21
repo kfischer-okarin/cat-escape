@@ -105,12 +105,7 @@ def handle_input(args, input_event)
           finished: false,
           direction: input_event[:direction].dup
         }
-        direction_x = input_event[:direction][:x]
-        if direction_x.positive?
-          cat[:facing_right] = true
-        elsif direction_x.negative?
-          cat[:facing_right] = false
-        end
+        update_cat_facing_direction(cat, input_event[:direction])
       when :box_moved
         box = args.state.stage[:objects].find { |object|
           object[:x] == result[:from][:x] && object[:y] == result[:from][:y]
@@ -129,6 +124,14 @@ def handle_input(args, input_event)
     args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
     cat = get_cat(args, args.state.current_cat)
     args.state.animations << { type: :cat_selected, ticks: 0, target: cat }
+  end
+end
+
+def update_cat_facing_direction(cat, direction)
+  if direction[:x].positive?
+    cat[:facing_right] = true
+  elsif direction[:x].negative?
+    cat[:facing_right] = false
   end
 end
 
