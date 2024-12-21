@@ -12,6 +12,7 @@ COLORS = {
 }.transform_values(&:freeze).freeze
 
 def tick(args)
+  setup(args) if args.state.tick_count == 0
   args.state.stage ||= prepare_stage(STAGE)
   args.state.animations ||= []
 
@@ -43,6 +44,10 @@ def tick(args)
   }
 
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
+end
+
+def setup(args)
+  args.audio[:bgm] = { input: 'Wholesome.ogg' }
 end
 
 def process_input(args)
