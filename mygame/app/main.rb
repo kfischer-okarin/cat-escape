@@ -78,8 +78,7 @@ def handle_input(args, input_event)
     movement_results.each do |result|
       case result[:type]
       when :cat_moved
-        cat_index = result[:cat]
-        cat = args.state.stage[:cats][cat_index]
+        cat = get_cat(args, result[:cat])
         args.state.animations << {
           type: :move,
           target: cat,
@@ -103,6 +102,10 @@ def handle_input(args, input_event)
   when :switch_cat
     args.state.current_cat = (args.state.current_cat + 1) % args.state.stage[:cats].size
   end
+end
+
+def get_cat(args, index)
+  args.state.stage[:cats][index]
 end
 
 CELL_SIZE = 64
