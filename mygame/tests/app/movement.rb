@@ -127,7 +127,8 @@ describe 'moving a cat' do
 
     expected = {
       type: :pushed_box_into_cat,
-      cat: 0,
+      from_cat: 0,
+      to_cat: 1,
       from: { x: 2, y: 1 },
       to: { x: 3, y: 1 }
     }

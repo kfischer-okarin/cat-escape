@@ -32,7 +32,7 @@ def try_to_move_cat(stage, cat:, direction:)
       y_behind_box = target_y + direction[:y]
       cell_behind_box = stage[:cells][x_behind_box][y_behind_box]
       object_behind_box = stage[:objects].find { |object| object[:x] == x_behind_box && object[:y] == y_behind_box }
-      cat_behind_box = stage[:cats].find { |cat| cat[:x] == x_behind_box && cat[:y] == y_behind_box }
+      cat_behind_box = stage[:cats].find_index { |cat| cat[:x] == x_behind_box && cat[:y] == y_behind_box }
       if cell_behind_box == :wall || (object_behind_box && object_behind_box[:type] == :box)
         result << {
           type: :cat_bumped_into_box,
@@ -43,7 +43,8 @@ def try_to_move_cat(stage, cat:, direction:)
       elsif cat_behind_box
         result << {
           type: :pushed_box_into_cat,
-          cat: cat,
+          from_cat: cat,
+          to_cat: cat_behind_box,
           from: target_position,
           to: { x: x_behind_box, y: y_behind_box }
         }
