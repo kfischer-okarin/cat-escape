@@ -8,10 +8,19 @@ def try_to_move_cat(stage, cat:, direction:)
   target_position = { x: target_x, y: target_y }
 
   target_cell = stage[:cells][target_x][target_y]
+  cat_in_target_cell = find_cat_index(stage, target_position)
   if target_cell == :wall
     result << {
       type: :cat_bumped_into_wall,
       cat: cat,
+      from: cat_position,
+      to: target_position
+    }
+  elsif cat_in_target_cell
+    result << {
+      type: :cat_bumped_into_cat,
+      from_cat: cat,
+      to_cat: cat_in_target_cell,
       from: cat_position,
       to: target_position
     }

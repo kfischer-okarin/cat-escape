@@ -130,6 +130,16 @@ def handle_input(args, input_event)
           target: find_object(args.state.stage, result[:from], type: :box),
           direction: input_event[:direction]
         )
+      when :cat_bumped_into_cat
+        args.audio[:angry_cat] = { input: "audio/angry_cat#{rand(3) + 1}.wav" }
+        other_cat = get_cat(args, result[:to_cat])
+        update_cat_facing_direction(other_cat, input_event[:direction].merge(x: -input_event[:direction][:x]))
+        args.state.animations << Animation.build(type: :angry_cat, target: other_cat)
+        args.state.animations << Animation.build(
+          type: :canceled_move,
+          target: cat,
+          direction: input_event[:direction]
+        )
       end
     end
   when :switch_cat
