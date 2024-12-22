@@ -51,10 +51,7 @@ SCARED_CAT_SPRITES = [
 ].freeze
 
 def tick(args)
-  setup(args) if Kernel.tick_count.zero?
-  args.state.stage ||= prepare_stage(STAGE)
-  args.state.current_cat ||= 0
-  args.state.animations ||= []
+  setup(args, stage_number: 0) if Kernel.tick_count.zero?
 
   gameplay_tick(args)
 
@@ -88,7 +85,11 @@ def tick(args)
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
 end
 
-def setup(args)
+def setup(args, stage_number:)
+  args.state.stage_number = stage_number
+  args.state.stage = prepare_stage(STAGE)
+  args.state.current_cat = 0
+  args.state.animations = []
   args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true, gain: 0.3 }
 end
 
