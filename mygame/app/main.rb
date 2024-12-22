@@ -103,6 +103,8 @@ def process_input(args)
     { type: :move, direction: { x: 1, y: 0 } }
   elsif key_down.tab
     { type: :switch_cat }
+  elsif key_down.r
+    { type: :restart }
   end
 end
 
@@ -113,6 +115,7 @@ def gameplay_tick(args, input_event: nil)
 
   render_stage(args, args.state.stage)
   render_current_cat_portrait(args)
+  render_ui(args)
 end
 
 def handle_gameplay_input(args, input_event)
@@ -172,6 +175,8 @@ def handle_gameplay_input(args, input_event)
     end
   when :switch_cat
     switch_cat(args)
+  when :restart
+    setup(args, stage_number: args.state.stage_number)
   end
 end
 
@@ -354,6 +359,20 @@ def render_current_cat_portrait(args)
   cat = get_cat(args, args.state.current_cat)
   source_w = 39
   source_h = 30
+  args.outputs.primitives << {
+    x: 0,
+    y: 0,
+    w: source_w * 5,
+    h: source_h * 5,
+    path: cat_sprite(cat, args.state.current_cat),
+    source_x: 23,
+    source_y: 20,
+    source_w: source_w,
+    source_h: source_h
+  }
+end
+
+def render_ui(args)
   unless other_cat_exited?(args)
     args.outputs.primitives << {
       x: 50,
@@ -370,16 +389,21 @@ def render_current_cat_portrait(args)
       path: 'sprites/keyboard_tab.png'
     }
   end
+
   args.outputs.primitives << {
     x: 0,
-    y: 0,
-    w: source_w * 5,
-    h: source_h * 5,
-    path: cat_sprite(cat, args.state.current_cat),
-    source_x: 23,
-    source_y: 20,
-    source_w: source_w,
-    source_h: source_h
+    y: 656,
+    w: 64,
+    h: 64,
+    path: 'sprites/keyboard_r.png'
+  }
+  args.outputs.primitives << {
+    x: 64,
+    y: 706,
+    text: 'Restart',
+    size_px: 36,
+    r: 255, g: 255, b: 255,
+    font: 'fonts/m6x11plus.ttf'
   }
 end
 
