@@ -38,7 +38,7 @@ SCARED_CAT_SPRITES = [
 ].freeze
 
 def tick(args)
-  setup(args) if args.state.tick_count == 0
+  setup(args) if Kernel.tick_count == 0
   args.state.stage ||= prepare_stage(STAGE)
   args.state.current_cat ||= 0
   args.state.animations ||= []
