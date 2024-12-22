@@ -204,11 +204,11 @@ def find_object(stage, position, type: nil)
 end
 
 def find_cat(stage, position)
-  stage[:cats].find { |cat| cat[:x] == position[:x] && cat[:y] == position[:y] }
+  stage[:cats].find { |cat| cat[:x] == position[:x] && cat[:y] == position[:y] && !cat[:exit] }
 end
 
 def find_cat_index(stage, position)
-  stage[:cats].index { |cat| cat[:x] == position[:x] && cat[:y] == position[:y] }
+  stage[:cats].index { |cat| cat[:x] == position[:x] && cat[:y] == position[:y] && !cat[:exit] }
 end
 
 def update_cat_facing_direction(cat, direction)
