@@ -27,6 +27,15 @@ COLORS = {
 # Box move sound by freesound_community from Pixabay
 # https://pixabay.com/sound-effects/chair-sliding-28432/
 
+# m6x11plus font by Daniel Linssen
+# https://managore.itch.io/m6x11
+
+# Box sprite by Kenney.nl
+# https://kenney.nl/assets/sokoban
+
+# Icons by Kenney.nl
+# https://kenney.nl/assets/board-game-icons
+
 CAT_SPRITES = [
   'sprites/cat.png',
   'sprites/tuxedo-cat.png'
@@ -267,6 +276,21 @@ def render_current_cat_portrait(args)
   cat = get_cat(args, args.state.current_cat)
   source_w = 39
   source_h = 30
+  args.outputs.primitives << {
+    x: 50,
+    y: 154,
+    w: 32,
+    h: 32,
+    path: 'sprites/arrow_reserve.png'
+  }
+  args.outputs.primitives << {
+    x: 90,
+    y: 190,
+    text: 'tab',
+    size_px: 36,
+    font: 'fonts/m6x11plus.ttf',
+    r: 255, g: 255, b: 255
+  }
   args.outputs.primitives << {
     x: 0,
     y: 0,
