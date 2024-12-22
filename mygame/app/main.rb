@@ -2,16 +2,6 @@ require 'app/animation'
 require 'app/movement'
 
 STAGES = [
-  # Stage 0
-  (
-    <<~STAGE.freeze
-      XXXXXXX
-      XC   EX
-      XXBXBXX
-      XX C XX
-    STAGE
-  ),
-  # Stage 1
   (
     <<~STAGE.freeze
       XXXXXXXXXXX
@@ -21,7 +11,25 @@ STAGES = [
       XXXX X   XX
       XXXXXXXXXXX
     STAGE
-  )
+  ),
+  (
+    <<~STAGE.freeze
+      XXXXXXX
+      XC   EX
+      XXBXBXX
+      XX C XX
+    STAGE
+  ),
+  (
+    <<~STAGE.freeze
+      XXXXXXX
+      XCBC XX
+      XXBXBXX
+      XX X XX
+      X B  EX
+      XX X XX
+    STAGE
+  ),
 ]
 
 $gtk.reset
