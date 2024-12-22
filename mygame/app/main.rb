@@ -32,6 +32,11 @@ CAT_SPRITES = [
   'sprites/tuxedo-cat.png'
 ].freeze
 
+SCARED_CAT_SPRITES = [
+  'sprites/cat-scared.png',
+  'sprites/tuxedo-cat-scared.png'
+].freeze
+
 def tick(args)
   setup(args) if args.state.tick_count == 0
   args.state.stage ||= prepare_stage(STAGE)
@@ -62,7 +67,7 @@ def tick(args)
       y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
       w: cat[:w],
       h: cat[:h],
-      path: CAT_SPRITES[index],
+      path: cat_sprite(cat, index),
       flip_horizontally: !cat[:facing_right],
       **color
     }
@@ -119,6 +124,7 @@ def handle_input(args, input_event)
         args.audio[:angry_cat] = { input: "audio/angry_cat#{rand(3) + 1}.wav" }
         other_cat = get_cat(args, result[:to_cat])
         update_cat_facing_direction(other_cat, input_event[:direction].merge(x: -input_event[:direction][:x]))
+        args.state.animations << Animation.build(type: :scared_cat, target: cat)
         args.state.animations << Animation.build(type: :angry_cat, target: other_cat)
         args.state.animations << Animation.build(
           type: :canceled_move,
@@ -134,6 +140,7 @@ def handle_input(args, input_event)
         args.audio[:angry_cat] = { input: "audio/angry_cat#{rand(3) + 1}.wav" }
         other_cat = get_cat(args, result[:to_cat])
         update_cat_facing_direction(other_cat, input_event[:direction].merge(x: -input_event[:direction][:x]))
+        args.state.animations << Animation.build(type: :scared_cat, target: cat)
         args.state.animations << Animation.build(type: :angry_cat, target: other_cat)
         args.state.animations << Animation.build(
           type: :canceled_move,
@@ -226,7 +233,8 @@ def prepare_stage(stage)
         result[:cats] << {
           x: x, y: y,
           sprite_offset_x: 0, sprite_offset_y: 0, w: CELL_SIZE, h: CELL_SIZE,
-          facing_right: true
+          facing_right: true,
+          scared: false
         }
       when :box
         result[:objects] << { type: object_type, x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
@@ -256,7 +264,7 @@ OBJECT_SYMBOLS = {
 }.freeze
 
 def render_current_cat_portrait(args)
-  current_cat_sprite = CAT_SPRITES[args.state.current_cat]
+  cat = get_cat(args, args.state.current_cat)
   source_w = 39
   source_h = 30
   args.outputs.primitives << {
@@ -264,10 +272,15 @@ def render_current_cat_portrait(args)
     y: 0,
     w: source_w * 5,
     h: source_h * 5,
-    path: current_cat_sprite,
+    path: cat_sprite(cat, args.state.current_cat),
     source_x: 23,
     source_y: 20,
     source_w: source_w,
     source_h: source_h
   }
+end
+
+def cat_sprite(cat, cat_index)
+  sprite_array = cat[:scared] ? SCARED_CAT_SPRITES : CAT_SPRITES
+  sprite_array[cat_index]
 end

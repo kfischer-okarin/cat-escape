@@ -72,6 +72,16 @@ module Animation
       handle_cat_selected_animation(animation)
     end
 
+    def handle_scared_cat_animation(animation)
+      case animation[:ticks]
+      when 3
+        animation[:target][:scared] = true
+      when 20
+        animation[:target][:scared] = false
+        animation[:finished] = true
+      end
+    end
+
     def parabol_easing(tick, duration)
       t = tick / duration
       4 * t * (1 - t)
