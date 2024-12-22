@@ -173,15 +173,21 @@ def handle_input(args, input_event)
 end
 
 def switch_cat(args, skip_animation: false)
+  return if other_cat_exited?(args)
+
   new_cat_index = (args.state.current_cat + 1) % args.state.stage[:cats].size
   new_cat = get_cat(args, new_cat_index)
-  return if new_cat[:exit]
 
   args.state.current_cat = new_cat_index
   return if skip_animation
 
   args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
   args.state.animations << Animation.build(type: :cat_selected, target: new_cat)
+end
+
+def other_cat_exited?(args)
+  other_cat_index = 1 - args.state.current_cat
+  args.state.stage[:cats][other_cat_index][:exit]
 end
 
 def handle_exited_cat(args)
@@ -318,21 +324,23 @@ def render_current_cat_portrait(args)
   cat = get_cat(args, args.state.current_cat)
   source_w = 39
   source_h = 30
-  args.outputs.primitives << {
-    x: 50,
-    y: 154,
-    w: 32,
-    h: 32,
-    path: 'sprites/arrow_reserve.png'
-  }
-  args.outputs.primitives << {
-    x: 90,
-    y: 190,
-    text: 'tab',
-    size_px: 36,
-    font: 'fonts/m6x11plus.ttf',
-    r: 255, g: 255, b: 255
-  }
+  unless other_cat_exited?(args)
+    args.outputs.primitives << {
+      x: 50,
+      y: 154,
+      w: 32,
+      h: 32,
+      path: 'sprites/arrow_reserve.png'
+    }
+    args.outputs.primitives << {
+      x: 90,
+      y: 190,
+      text: 'tab',
+      size_px: 36,
+      font: 'fonts/m6x11plus.ttf',
+      r: 255, g: 255, b: 255
+    }
+  end
   args.outputs.primitives << {
     x: 0,
     y: 0,
