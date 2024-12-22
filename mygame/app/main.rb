@@ -61,6 +61,8 @@ def tick(args)
 
   Animation.update_animations(args.state.animations)
 
+  handle_exited_cat(args)
+
   args.outputs.background_color = { r: 100, g: 100, b: 100 }
   args.outputs.primitives << args.state.stage[:sprites]
   args.outputs.primitives << args.state.stage[:objects].map { |object|
@@ -81,6 +83,7 @@ def tick(args)
       h: cat[:h],
       path: cat_sprite(cat, index),
       flip_horizontally: !cat[:facing_right],
+      a: cat[:alpha],
       **color
     }
   }
@@ -159,13 +162,38 @@ def handle_input(args, input_event)
           target: cat,
           direction: input_event[:direction]
         )
+      when :cat_exited
+        args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
+        args.state.animations << Animation.build(type: :exit, target: cat, audio: args.audio)
       end
     end
   when :switch_cat
-    args.state.current_cat = (args.state.current_cat + 1) % args.state.stage[:cats].size
-    args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
-    cat = get_cat(args, args.state.current_cat)
-    args.state.animations << Animation.build(type: :cat_selected, target: cat)
+    switch_cat(args)
+  end
+end
+
+def switch_cat(args, skip_animation: false)
+  new_cat_index = (args.state.current_cat + 1) % args.state.stage[:cats].size
+  new_cat = get_cat(args, new_cat_index)
+  return if new_cat[:exit]
+
+  args.state.current_cat = new_cat_index
+  return if skip_animation
+
+  args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
+  args.state.animations << Animation.build(type: :cat_selected, target: new_cat)
+end
+
+def handle_exited_cat(args)
+  cat = get_cat(args, args.state.current_cat)
+  return unless cat[:exit]
+
+  all_cats_exited = args.state.stage[:cats].all? { |cat| cat[:exit] }
+  if all_cats_exited
+    args.audio[:bgm].stop
+    $gtk.notify! 'All cats exited!'
+  else
+    switch_cat(args, skip_animation: true)
   end
 end
 
@@ -245,6 +273,7 @@ def prepare_stage(stage)
         result[:cats] << {
           x: x, y: y,
           sprite_offset_x: 0, sprite_offset_y: 0, w: CELL_SIZE, h: CELL_SIZE,
+          alpha: 255, exit: false,
           facing_right: true,
           scared: false
         }

@@ -82,6 +82,18 @@ module Animation
       end
     end
 
+    def handle_exit_animation(animation)
+      duration = 20
+      factor = Easing.smooth_step(start_at: 0, end_at: duration, tick_count: animation[:ticks], power: 2)
+      if animation[:ticks] == duration
+        animation[:target][:alpha] = 0
+        animation[:target][:exit] = true
+        animation[:finished] = true
+      else
+        animation[:target][:alpha] = 255 - (factor * 255).floor
+      end
+    end
+
     def parabol_easing(tick, duration)
       t = tick / duration
       4 * t * (1 - t)
