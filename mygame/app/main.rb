@@ -38,6 +38,7 @@ COLORS = {
 
 # Icons by Kenney.nl
 # https://kenney.nl/assets/board-game-icons
+# https://kenney.nl/assets/input-prompts
 
 CAT_SPRITES = [
   'sprites/cat.png',
@@ -333,12 +334,11 @@ def render_current_cat_portrait(args)
       path: 'sprites/arrow_reserve.png'
     }
     args.outputs.primitives << {
-      x: 90,
-      y: 190,
-      text: 'tab',
-      size_px: 36,
-      font: 'fonts/m6x11plus.ttf',
-      r: 255, g: 255, b: 255
+      x: 80,
+      y: 138,
+      w: 64,
+      h: 64,
+      path: 'sprites/keyboard_tab.png'
     }
   end
   args.outputs.primitives << {
