@@ -53,8 +53,9 @@ SCARED_CAT_SPRITES = [
 def tick(args)
   setup(args, stage_number: 0) if Kernel.tick_count.zero?
 
-  gameplay_tick(args)
+  input_event = process_input(args)
 
+  gameplay_tick(args, input_event: input_event)
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
 end
 
@@ -81,9 +82,7 @@ def process_input(args)
   end
 end
 
-def gameplay_tick(args)
-  input_event = process_input(args)
-
+def gameplay_tick(args, input_event: nil)
   handle_gameplay_input(args, input_event) if input_event && args.state.animations.empty?
   handle_exited_cat(args)
   Animation.update_animations(args.state.animations)
