@@ -55,30 +55,7 @@ def tick(args)
 
   gameplay_tick(args)
 
-  args.outputs.background_color = { r: 100, g: 100, b: 100 }
-  args.outputs.primitives << args.state.stage[:sprites]
-  args.outputs.primitives << args.state.stage[:objects].map { |object|
-    {
-      x: (object[:x] * CELL_SIZE) + args.state.stage[:offset_x] + object[:sprite_offset_x],
-      y: (object[:y] * CELL_SIZE) + args.state.stage[:offset_y] + object[:sprite_offset_y],
-      w: CELL_SIZE,
-      h: CELL_SIZE,
-      **object_sprite(object)
-    }
-  }
-  args.outputs.primitives << args.state.stage[:cats].map_with_index { |cat, index|
-    color = index == args.state.current_cat ? COLORS[:white] : COLORS[:gray]
-    {
-      x: (cat[:x] * CELL_SIZE) + args.state.stage[:offset_x] + cat[:sprite_offset_x],
-      y: (cat[:y] * CELL_SIZE) + args.state.stage[:offset_y] + cat[:sprite_offset_y],
-      w: cat[:w],
-      h: cat[:h],
-      path: cat_sprite(cat, index),
-      flip_horizontally: !cat[:facing_right],
-      a: cat[:alpha],
-      **color
-    }
-  }
+  render_stage(args, args.state.stage)
 
   render_current_cat_portrait(args)
 
@@ -293,6 +270,33 @@ def prepare_stage(stage)
   end
 
   result
+end
+
+def render_stage(args, stage)
+  args.outputs.background_color = { r: 100, g: 100, b: 100 }
+  args.outputs.primitives << stage[:sprites]
+  args.outputs.primitives << stage[:objects].map { |object|
+    {
+      x: (object[:x] * CELL_SIZE) + stage[:offset_x] + object[:sprite_offset_x],
+      y: (object[:y] * CELL_SIZE) + stage[:offset_y] + object[:sprite_offset_y],
+      w: CELL_SIZE,
+      h: CELL_SIZE,
+      **object_sprite(object)
+    }
+  }
+  args.outputs.primitives << stage[:cats].map_with_index { |cat, index|
+    color = index == args.state.current_cat ? COLORS[:white] : COLORS[:gray]
+    {
+      x: (cat[:x] * CELL_SIZE) + stage[:offset_x] + cat[:sprite_offset_x],
+      y: (cat[:y] * CELL_SIZE) + stage[:offset_y] + cat[:sprite_offset_y],
+      w: cat[:w],
+      h: cat[:h],
+      path: cat_sprite(cat, index),
+      flip_horizontally: !cat[:facing_right],
+      a: cat[:alpha],
+      **color
+    }
+  }
 end
 
 CELL_TYPE_SYMBOLS = {
