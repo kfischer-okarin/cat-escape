@@ -1,14 +1,30 @@
 require 'app/animation'
 require 'app/movement'
 
-STAGE = <<~STAGE.freeze
-  XXXXXXXXXXX
-  XXXXCXXXXXX
-  XXXX X   XX
-  XC BB    EX
-  XXXX X   XX
-  XXXXXXXXXXX
-STAGE
+STAGES = [
+  # Stage 0
+  (
+    <<~STAGE.freeze
+      XXXXXXX
+      XC   EX
+      XXBXBXX
+      XX C XX
+    STAGE
+  ),
+  # Stage 1
+  (
+    <<~STAGE.freeze
+      XXXXXXXXXXX
+      XXXXCXXXXXX
+      XXXX X   XX
+      XC BB    EX
+      XXXX X   XX
+      XXXXXXXXXXX
+    STAGE
+  )
+]
+
+$gtk.reset
 
 COLORS = {
   black: { r: 0, g: 0, b: 0 },
@@ -61,7 +77,7 @@ end
 
 def setup(args, stage_number:)
   args.state.stage_number = stage_number
-  args.state.stage = prepare_stage(STAGE)
+  args.state.stage = prepare_stage(STAGES[stage_number])
   args.state.current_cat = 0
   args.state.animations = []
   args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true, gain: 0.3 }
@@ -175,8 +191,8 @@ def handle_exited_cat(args)
 
   all_cats_exited = args.state.stage[:cats].all? { |cat| cat[:exit] }
   if all_cats_exited
-    args.audio[:bgm].stop
-    $gtk.notify! 'All cats exited!'
+    args.state.stage_number += 1
+    setup(args, stage_number: args.state.stage_number)
   else
     switch_cat(args, skip_animation: true)
   end
