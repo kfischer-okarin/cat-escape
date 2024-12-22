@@ -55,10 +55,6 @@ def tick(args)
 
   gameplay_tick(args)
 
-  render_stage(args, args.state.stage)
-
-  render_current_cat_portrait(args)
-
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
 end
 
@@ -87,9 +83,13 @@ end
 
 def gameplay_tick(args)
   input_event = process_input(args)
+
   handle_gameplay_input(args, input_event) if input_event && args.state.animations.empty?
   handle_exited_cat(args)
   Animation.update_animations(args.state.animations)
+
+  render_stage(args, args.state.stage)
+  render_current_cat_portrait(args)
 end
 
 def handle_gameplay_input(args, input_event)
