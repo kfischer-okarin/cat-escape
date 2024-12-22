@@ -30,6 +30,14 @@ STAGES = [
       XX X XX
     STAGE
   ),
+  (
+    <<~STAGE.freeze
+      XXXXXXXCXXX
+      XXXB  BB XX
+      XC  B B BEX
+      XXX  B B XX
+    STAGE
+  )
 ]
 
 $gtk.reset
@@ -54,6 +62,9 @@ COLORS = {
 # Box move sound by freesound_community from Pixabay
 # https://pixabay.com/sound-effects/chair-sliding-28432/
 
+# Paw icons by logisstudio from Flaticon
+# https://www.flaticon.com/free-icon/pets_9513911
+
 # m6x11plus font by Daniel Linssen
 # https://managore.itch.io/m6x11
 
@@ -77,10 +88,12 @@ SCARED_CAT_SPRITES = [
 def tick(args)
   setup(args, stage_number: 0) if Kernel.tick_count.zero?
 
-  input_event = process_input(args)
+  input_event = process_input(args) unless args.state.game_over
 
   gameplay_tick(args, input_event: input_event)
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
+
+  game_over_screen(args) if args.state.game_over
 end
 
 def setup(args, stage_number:)
@@ -89,6 +102,7 @@ def setup(args, stage_number:)
   args.state.current_cat = 0
   args.state.animations = []
   args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true, gain: 0.3 }
+  args.state.game_over = false
 end
 
 def process_input(args)
@@ -205,7 +219,11 @@ def handle_exited_cat(args)
   all_cats_exited = args.state.stage[:cats].all? { |cat| cat[:exit] }
   if all_cats_exited
     args.state.stage_number += 1
-    setup(args, stage_number: args.state.stage_number)
+    if args.state.stage_number < STAGES.size - 1
+      setup(args, stage_number: args.state.stage_number)
+    else
+      args.state.game_over = true
+    end
   else
     switch_cat(args, skip_animation: true)
   end
@@ -402,6 +420,51 @@ def render_ui(args)
     y: 706,
     text: 'Restart',
     size_px: 36,
+    r: 255, g: 255, b: 255,
+    font: 'fonts/m6x11plus.ttf'
+  }
+end
+
+def game_over_screen(args)
+  args.outputs.primitives << {
+    x: 320,
+    y: 180,
+    w: 640,
+    h: 360,
+    r: 150, g: 33, b: 41,
+    path: :pixel
+  }
+
+  [
+    [350, 330, 45],
+    [480, 200, 135],
+    [610, 230, 305],
+    [400, 280, 60],
+    [530, 350, 180],
+    [660, 320, 330],
+    [440, 450, 90],
+    [570, 420, 210],
+    [800, 290, 0],
+    [770, 470, 135]
+  ].each do |x, y, angle|
+    args.outputs.primitives << {
+      x: x,
+      y: y,
+      angle: angle,
+      w: 64,
+      h: 64,
+      r: 28, g: 69, b: 24, a: 100,
+      path: 'sprites/paw.png'
+    }
+  end
+
+  args.outputs.primitives << {
+    x: 640,
+    y: 360,
+    anchor_x: 0.5,
+    anchor_y: 0.5,
+    text: 'Congratulations!',
+    size_px: 60,
     r: 255, g: 255, b: 255,
     font: 'fonts/m6x11plus.ttf'
   }
