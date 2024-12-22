@@ -56,13 +56,7 @@ def tick(args)
   args.state.current_cat ||= 0
   args.state.animations ||= []
 
-  input_event = process_input(args)
-
-  handle_input(args, input_event) if input_event && args.state.animations.empty?
-
-  Animation.update_animations(args.state.animations)
-
-  handle_exited_cat(args)
+  gameplay_tick(args)
 
   args.outputs.background_color = { r: 100, g: 100, b: 100 }
   args.outputs.primitives << args.state.stage[:sprites]
@@ -113,7 +107,14 @@ def process_input(args)
   end
 end
 
-def handle_input(args, input_event)
+def gameplay_tick(args)
+  input_event = process_input(args)
+  handle_gameplay_input(args, input_event) if input_event && args.state.animations.empty?
+  handle_exited_cat(args)
+  Animation.update_animations(args.state.animations)
+end
+
+def handle_gameplay_input(args, input_event)
   case input_event[:type]
   when :move
     movement_results = try_to_move_cat(
