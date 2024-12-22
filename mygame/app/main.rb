@@ -2,9 +2,12 @@ require 'app/animation'
 require 'app/movement'
 
 STAGE = <<~STAGE.freeze
-  XXXXXXXXXX
-  XCB   C  X
-  XXXXXXXXXX
+  XXXXXXXXXXX
+  XXXXCXXXXXX
+  XXXX X   XX
+  XC BB    EX
+  XXXX X   XX
+  XXXXXXXXXXX
 STAGE
 
 COLORS = {
@@ -66,7 +69,7 @@ def tick(args)
       y: (object[:y] * CELL_SIZE) + args.state.stage[:offset_y] + object[:sprite_offset_y],
       w: CELL_SIZE,
       h: CELL_SIZE,
-      path: 'sprites/crate_42.png',
+      **object_sprite(object)
     }
   }
   args.outputs.primitives << args.state.stage[:cats].map_with_index { |cat, index|
@@ -245,7 +248,7 @@ def prepare_stage(stage)
           facing_right: true,
           scared: false
         }
-      when :box
+      when :box, :exit
         result[:objects] << { type: object_type, x: x, y: y, sprite_offset_x: 0, sprite_offset_y: 0 }
       end
     end
@@ -269,8 +272,18 @@ end
 
 OBJECT_SYMBOLS = {
   'C' => :cat,
-  'B' => :box
+  'B' => :box,
+  'E' => :exit
 }.freeze
+
+def object_sprite(object)
+  case object[:type]
+  when :box
+    { path: 'sprites/crate_42.png' }
+  when :exit
+    { path: 'sprites/flag_square.png', r: 255, g: 255, b: 0 }
+  end
+end
 
 def render_current_cat_portrait(args)
   cat = get_cat(args, args.state.current_cat)
