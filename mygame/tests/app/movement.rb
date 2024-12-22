@@ -156,4 +156,24 @@ describe 'moving a cat' do
     }
     assert.includes! result, expected
   end
+
+  it 'can exit the stage' do
+    stage = prepare_stage(<<~STAGE)
+      XXXX
+      XCEX
+      XXXX
+    STAGE
+
+    result = try_to_move_cat(stage, cat: 0, direction: { x: 1, y: 0 })
+
+    expected = {
+      type: :cat_exited,
+      cat: 0,
+      from: { x: 1, y: 1 },
+      to: { x: 2, y: 1 }
+    }
+    assert.includes! result, expected
+    event_types = result.map { |event| event[:type] }
+    assert.includes! event_types, :cat_moved
+  end
 end

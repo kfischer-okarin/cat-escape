@@ -26,6 +26,7 @@ def try_to_move_cat(stage, cat:, direction:)
     }
   else
     box_in_cell = find_object(stage, target_position, type: :box)
+    exit_in_cell = find_object(stage, target_position, type: :exit)
 
     cat_moved_event = {
       type: :cat_moved,
@@ -66,6 +67,14 @@ def try_to_move_cat(stage, cat:, direction:)
       end
     else
       result << cat_moved_event
+      if exit_in_cell
+        result << {
+          type: :cat_exited,
+          cat: cat,
+          from: cat_position,
+          to: target_position
+        }
+      end
     end
   end
 
