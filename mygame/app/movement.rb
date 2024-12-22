@@ -16,9 +16,7 @@ def try_to_move_cat(stage, cat:, direction:)
       to: target_position
     }
   else
-    box_in_cell = stage[:objects].find { |object|
-      object[:x] == target_x && object[:y] == target_y && object[:type] == :box
-    }
+    box_in_cell = find_object(stage, target_position, type: :box)
 
     cat_moved_event = {
       type: :cat_moved,
@@ -30,9 +28,10 @@ def try_to_move_cat(stage, cat:, direction:)
     if box_in_cell
       x_behind_box = target_x + direction[:x]
       y_behind_box = target_y + direction[:y]
+      position_behind_box = { x: x_behind_box, y: y_behind_box }
       cell_behind_box = stage[:cells][x_behind_box][y_behind_box]
-      object_behind_box = stage[:objects].find { |object| object[:x] == x_behind_box && object[:y] == y_behind_box }
-      cat_behind_box = stage[:cats].find_index { |cat| cat[:x] == x_behind_box && cat[:y] == y_behind_box }
+      object_behind_box = find_object(stage, position_behind_box, type: :box)
+      cat_behind_box = find_cat_index(stage, position_behind_box)
       if cell_behind_box == :wall || (object_behind_box && object_behind_box[:type] == :box)
         result << {
           type: :cat_bumped_into_box,
@@ -46,14 +45,14 @@ def try_to_move_cat(stage, cat:, direction:)
           from_cat: cat,
           to_cat: cat_behind_box,
           from: target_position,
-          to: { x: x_behind_box, y: y_behind_box }
+          to: position_behind_box
         }
       else
         result << cat_moved_event
         result << {
           type: :box_moved,
           from: box_in_cell.slice(:x, :y),
-          to: { x: target_x + direction[:x], y: target_y + direction[:y] }
+          to: position_behind_box
         }
       end
     else

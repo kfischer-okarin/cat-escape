@@ -146,6 +146,14 @@ def find_object(stage, position, type: nil)
   }
 end
 
+def find_cat(stage, position)
+  stage[:cats].find { |cat| cat[:x] == position[:x] && cat[:y] == position[:y] }
+end
+
+def find_cat_index(stage, position)
+  stage[:cats].index { |cat| cat[:x] == position[:x] && cat[:y] == position[:y] }
+end
+
 def update_cat_facing_direction(cat, direction)
   if direction[:x].positive?
     cat[:facing_right] = true
