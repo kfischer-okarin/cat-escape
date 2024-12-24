@@ -147,59 +147,48 @@ def handle_gameplay_input(args, input_event)
     movement_results.each do |result|
       case result[:type]
       when :cat_moved
-        add_animation(
-          args,
-          Animation.build(type: :move, target: cat, direction: input_event[:direction])
-        )
+        add_animation(args, type: :move, target: cat, direction: input_event[:direction])
       when :box_moved
         args.audio[:box_moved] = { input: 'audio/move_box.wav', gain: 0.5 }
         add_animation(
           args,
-          Animation.build(
-            type: :move,
-            target: find_object(args.state.stage, result[:from], type: :box),
-            direction: input_event[:direction]
-          )
+          type: :move,
+          target: find_object(args.state.stage, result[:from], type: :box),
+          direction: input_event[:direction]
         )
       when :pushed_box_into_cat
         args.audio[:angry_cat] = { input: "audio/angry_cat#{rand(3) + 1}.wav" }
         other_cat = get_cat(args, result[:to_cat])
         update_cat_facing_direction(other_cat, input_event[:direction].merge(x: -input_event[:direction][:x]))
-        add_animation(args, Animation.build(type: :scared_cat, target: cat))
-        add_animation(args, Animation.build(type: :angry_cat, target: other_cat))
+        add_animation(args, type: :scared_cat, target: cat)
+        add_animation(args, type: :angry_cat, target: other_cat)
         add_animation(
           args,
-          Animation.build(
-            type: :canceled_move,
-            target: cat,
-            direction: input_event[:direction]
-          )
+          type: :canceled_move,
+          target: cat,
+          direction: input_event[:direction]
         )
         add_animation(
           args,
-          Animation.build(
-            type: :canceled_move,
-            target: find_object(args.state.stage, result[:from], type: :box),
-            direction: input_event[:direction]
-          )
+          type: :canceled_move,
+          target: find_object(args.state.stage, result[:from], type: :box),
+          direction: input_event[:direction]
         )
       when :cat_bumped_into_cat
         args.audio[:angry_cat] = { input: "audio/angry_cat#{rand(3) + 1}.wav" }
         other_cat = get_cat(args, result[:to_cat])
         update_cat_facing_direction(other_cat, input_event[:direction].merge(x: -input_event[:direction][:x]))
-        add_animation(args, Animation.build(type: :scared_cat, target: cat))
-        add_animation(args, Animation.build(type: :angry_cat, target: other_cat))
+        add_animation(args, type: :scared_cat, target: cat)
+        add_animation(args, type: :angry_cat, target: other_cat)
         add_animation(
           args,
-          Animation.build(
-            type: :canceled_move,
-            target: cat,
-            direction: input_event[:direction]
-          )
+          type: :canceled_move,
+          target: cat,
+          direction: input_event[:direction]
         )
       when :cat_exited
         args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
-        add_animation(args, Animation.build(type: :exit, target: cat, audio: args.audio))
+        add_animation(args, type: :exit, target: cat, audio: args.audio)
       end
     end
   when :switch_cat
@@ -219,7 +208,7 @@ def switch_cat(args, skip_animation: false)
   return if skip_animation
 
   args.audio[:meow] = { input: "audio/meow#{rand(8) + 1}.wav" }
-  add_animation(args, Animation.build(type: :cat_selected, target: new_cat))
+  add_animation(args, type: :cat_selected, target: new_cat)
 end
 
 def other_cat_exited?(args)
@@ -490,6 +479,6 @@ def cat_sprite(cat, cat_index)
   sprite_array[cat_index]
 end
 
-def add_animation(args, animation)
-  args.state.animations << animation
+def add_animation(args, animation_attributes)
+  args.state.animations << Animation.build(animation_attributes)
 end
