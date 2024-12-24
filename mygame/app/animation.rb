@@ -4,12 +4,12 @@ module Animation
       values.merge(ticks: 0, finished: false)
     end
 
-    def update_animations(animations)
+    def update_animations(args, animations)
       animations.each do |animation|
         handler_method_name = "handle_#{animation[:type]}_animation"
         animation[:ticks] += 1
         if respond_to?(handler_method_name)
-          send(handler_method_name, animation)
+          send(handler_method_name, args, animation)
         else
           animation[:finished] = true
           $gtk.notify! "No handler for animation type: #{animation[:type]}"
@@ -21,7 +21,7 @@ module Animation
 
     private
 
-    def handle_move_animation(animation)
+    def handle_move_animation(_args, animation)
       target = animation[:target]
       duration = 20
       factor = Easing.smooth_step(start_at: 0, end_at: duration, tick_count: animation[:ticks], power: 2)
@@ -37,7 +37,7 @@ module Animation
       end
     end
 
-    def handle_canceled_move_animation(animation)
+    def handle_canceled_move_animation(_args, animation)
       target = animation[:target]
       duration = 20
       factor = parabol_easing(animation[:ticks], duration)
@@ -51,7 +51,7 @@ module Animation
       end
     end
 
-    def handle_cat_selected_animation(animation)
+    def handle_cat_selected_animation(_args, animation)
       target = animation[:target]
       duration = 20
       factor = parabol_easing(animation[:ticks], duration)
@@ -68,11 +68,11 @@ module Animation
       animation[:finished] = true
     end
 
-    def handle_angry_cat_animation(animation)
-      handle_cat_selected_animation(animation)
+    def handle_angry_cat_animation(args, animation)
+      handle_cat_selected_animation(args, animation)
     end
 
-    def handle_scared_cat_animation(animation)
+    def handle_scared_cat_animation(_args, animation)
       case animation[:ticks]
       when 3
         animation[:target][:scared] = true
@@ -82,7 +82,7 @@ module Animation
       end
     end
 
-    def handle_exit_animation(animation)
+    def handle_exit_animation(_args, animation)
       duration = 20
       factor = Easing.smooth_step(start_at: 0, end_at: duration, tick_count: animation[:ticks], power: 2)
       if animation[:ticks] == duration
