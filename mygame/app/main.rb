@@ -219,7 +219,7 @@ def handle_exited_cat(args)
   all_cats_exited = args.state.stage[:cats].all? { |cat| cat[:exit] }
   if all_cats_exited
     args.state.stage_number += 1
-    if args.state.stage_number < STAGES.size - 1
+    if args.state.stage_number < STAGES.size
       setup(args, stage_number: args.state.stage_number)
     else
       args.state.game_over = true
