@@ -194,7 +194,7 @@ def handle_gameplay_input(args, input_event)
   when :switch_cat
     switch_cat(args)
   when :restart
-    setup(args, stage_number: args.state.stage_number)
+    add_animation(args, type: :level_transition)
   end
 end
 
