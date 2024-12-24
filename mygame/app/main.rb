@@ -100,7 +100,8 @@ def setup(args, stage_number:)
   args.state.stage_number = stage_number
   args.state.stage = prepare_stage(STAGES[stage_number])
   args.state.current_cat = 0
-  args.state.animations = []
+  args.state.animations ||= []
+  args.state.screen_overlays ||= []
   args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true, gain: 0.3 }
   args.state.game_over = false
 end
@@ -124,7 +125,6 @@ end
 
 def gameplay_tick(args, input_event: nil)
   handle_gameplay_input(args, input_event) if input_event && args.state.animations.empty?
-  handle_exited_cat(args)
   Animation.update_animations(args, args.state.animations)
 
   render_stage(args, args.state.stage)
@@ -224,7 +224,7 @@ def handle_exited_cat(args)
   if all_cats_exited
     args.state.stage_number += 1
     if args.state.stage_number < STAGES.size
-      setup(args, stage_number: args.state.stage_number)
+      add_animation(args, type: :level_transition)
     else
       args.state.game_over = true
     end
@@ -427,6 +427,7 @@ def render_ui(args)
     r: 255, g: 255, b: 255,
     font: 'fonts/m6x11plus.ttf'
   }
+  args.outputs.primitives << args.state.screen_overlays
 end
 
 def game_over_screen(args)

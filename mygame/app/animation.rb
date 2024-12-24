@@ -82,16 +82,77 @@ module Animation
       end
     end
 
-    def handle_exit_animation(_args, animation)
+    def handle_exit_animation(args, animation)
       duration = 20
       factor = Easing.smooth_step(start_at: 0, end_at: duration, tick_count: animation[:ticks], power: 2)
       if animation[:ticks] == duration
         animation[:target][:alpha] = 0
         animation[:target][:exit] = true
         animation[:finished] = true
+
+        handle_exited_cat(args)
       else
         animation[:target][:alpha] = 255 - (factor * 255).floor
       end
+    end
+
+    def handle_level_transition_animation(args, animation)
+      args.state.screen_overlays.reject! { |overlay| overlay[:level_transition] }
+
+      case animation[:ticks]
+      when 0...70
+        factor = Easing.smooth_stop(start_at: 0, end_at: 60, tick_count: animation[:ticks], power: 2)
+        args.state.screen_overlays.concat(transition_mask(1 - factor))
+        setup(args, stage_number: args.state.stage_number) if animation[:ticks] == 60
+      when 70..130
+        factor = Easing.smooth_start(start_at: 70, end_at: 130, tick_count: animation[:ticks], power: 2)
+        args.state.screen_overlays.concat(transition_mask(factor))
+      else
+        animation[:finished] = true
+      end
+    end
+
+    def transition_mask(zoom_factor)
+      center_size = 1024 * 10 * zoom_factor
+      half_center_size = center_size.idiv(2)
+      base = {
+        level_transition: true,
+        x: 0, y: 0, w: 1280, h: 720,
+        path: :pixel,
+        **COLORS[:orange]
+      }
+      [
+        {
+          **base,
+          x: 640 - half_center_size,
+          y: 360 - half_center_size,
+          w: center_size,
+          h: center_size,
+          path: 'sprites/paw-mask.png',
+        },
+        # bottom
+        {
+          **base,
+          h: 360 - half_center_size
+        },
+        # top
+        {
+          **base,
+          y: 360 + half_center_size,
+          h: 360 - half_center_size,
+        },
+        # left
+        {
+          **base,
+          w: 640 - half_center_size,
+        },
+        # right
+        {
+          **base,
+          x: 640 + half_center_size,
+          w: 640 - half_center_size,
+        }
+      ]
     end
 
     def parabol_easing(tick, duration)
