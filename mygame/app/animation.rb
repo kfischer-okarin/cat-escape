@@ -99,13 +99,22 @@ module Animation
     def handle_level_transition_animation(args, animation)
       args.state.screen_overlays.reject! { |overlay| overlay[:level_transition] }
 
+      length = 40
+      first_half_end = length
+      second_half_start = length + 10
+      animation_end = second_half_start + length
       case animation[:ticks]
-      when 0...70
-        factor = Easing.smooth_stop(start_at: 0, end_at: 60, tick_count: animation[:ticks], power: 2)
+      when 0...second_half_start
+        factor = Easing.smooth_stop(start_at: 0, end_at: first_half_end, tick_count: animation[:ticks], power: 2)
         args.state.screen_overlays.concat(transition_mask(1 - factor))
-        setup(args, stage_number: args.state.stage_number) if animation[:ticks] == 60
-      when 70..130
-        factor = Easing.smooth_start(start_at: 70, end_at: 130, tick_count: animation[:ticks], power: 2)
+        setup(args, stage_number: args.state.stage_number) if animation[:ticks] == first_half_end
+      when second_half_start...animation_end
+        factor = Easing.smooth_start(
+          start_at: second_half_start,
+          end_at: animation_end,
+          tick_count: animation[:ticks],
+          power: 2
+        )
         args.state.screen_overlays.concat(transition_mask(factor))
       else
         animation[:finished] = true
