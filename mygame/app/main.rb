@@ -194,7 +194,11 @@ def handle_gameplay_input(args, input_event)
   when :switch_cat
     switch_cat(args)
   when :restart
-    add_animation(args, type: :level_transition)
+    add_animation(
+      args,
+      type: :scene_transition,
+      on_transition: -> { setup(args, stage_number: args.state.stage_number) }
+    )
   end
 end
 
@@ -224,7 +228,11 @@ def handle_exited_cat(args)
   if all_cats_exited
     args.state.stage_number += 1
     if args.state.stage_number < STAGES.size
-      add_animation(args, type: :level_transition)
+      add_animation(
+        args,
+        type: :scene_transition,
+        on_transition: -> { setup(args, stage_number: args.state.stage_number) }
+      )
     else
       args.state.game_over = true
     end

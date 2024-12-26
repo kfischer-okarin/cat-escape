@@ -96,8 +96,8 @@ module Animation
       end
     end
 
-    def handle_level_transition_animation(args, animation)
-      args.state.screen_overlays.reject! { |overlay| overlay[:level_transition] }
+    def handle_scene_transition_animation(args, animation)
+      args.state.screen_overlays.reject! { |overlay| overlay[:scene_transition] }
 
       length = 40
       first_half_end = length
@@ -107,7 +107,7 @@ module Animation
       when 0...second_half_start
         factor = Easing.smooth_stop(start_at: 0, end_at: first_half_end, tick_count: animation[:ticks], power: 2)
         args.state.screen_overlays.concat(transition_mask(1 - factor))
-        setup(args, stage_number: args.state.stage_number) if animation[:ticks] == first_half_end
+        animation[:on_transition].call if animation[:ticks] == first_half_end
       when second_half_start...animation_end
         factor = Easing.smooth_start(
           start_at: second_half_start,
@@ -125,7 +125,7 @@ module Animation
       center_size = 1024 * 10 * zoom_factor
       half_center_size = center_size.idiv(2)
       base = {
-        level_transition: true,
+        scene_transition: true,
         x: 0, y: 0, w: 1280, h: 720,
         path: :pixel,
         **COLORS[:orange]
