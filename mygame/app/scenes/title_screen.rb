@@ -19,6 +19,13 @@ module Scenes
         alignment_enum: 1,
         r: 114, g: 48, b: 14
       )
+      return unless args.inputs.keyboard.key_down.space
+
+      add_animation(
+        args,
+        type: :scene_transition,
+        on_transition: -> { $next_scene = Scenes::Gameplay.new(args, stage_number: 0) }
+      )
     end
 
     private

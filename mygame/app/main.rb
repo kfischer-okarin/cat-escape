@@ -1,5 +1,7 @@
 require 'app/animation'
 require 'app/movement'
+require 'app/scenes/gameplay'
+require 'app/scenes/title_screen'
 
 STAGES = [
   (
@@ -86,24 +88,26 @@ SCARED_CAT_SPRITES = [
 ].freeze
 
 def tick(args)
-  setup(args, stage_number: 0) if Kernel.tick_count.zero?
+  setup(args) if Kernel.tick_count.zero?
 
-  input_event = process_input(args) unless args.state.game_over
+  Animation.update_animations(args, args.state.animations)
 
-  gameplay_tick(args, input_event: input_event)
+  $scene.tick(args)
+
+  if $next_scene
+    $scene = $next_scene
+    $next_scene = nil
+  end
+
+  args.outputs.primitives << args.state.screen_overlays
+
   args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
-
-  game_over_screen(args) if args.state.game_over
 end
 
-def setup(args, stage_number:)
-  args.state.stage_number = stage_number
-  args.state.stage = prepare_stage(STAGES[stage_number])
-  args.state.current_cat = 0
-  args.state.animations ||= []
-  args.state.screen_overlays ||= []
-  args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true, gain: 0.3 }
-  args.state.game_over = false
+def setup(args)
+  args.state.animations = []
+  args.state.screen_overlays = []
+  $scene = Scenes::TitleScreen.new
 end
 
 def process_input(args)
@@ -125,7 +129,6 @@ end
 
 def gameplay_tick(args, input_event: nil)
   handle_gameplay_input(args, input_event) if input_event && args.state.animations.empty?
-  Animation.update_animations(args, args.state.animations)
 
   render_stage(args, args.state.stage)
   render_current_cat_portrait(args)
@@ -197,7 +200,7 @@ def handle_gameplay_input(args, input_event)
     add_animation(
       args,
       type: :scene_transition,
-      on_transition: -> { setup(args, stage_number: args.state.stage_number) }
+      on_transition: -> { $next_scene = Scenes::Gameplay.new(args, stage_number: args.state.stage_number) }
     )
   end
 end
@@ -231,7 +234,7 @@ def handle_exited_cat(args)
       add_animation(
         args,
         type: :scene_transition,
-        on_transition: -> { setup(args, stage_number: args.state.stage_number) }
+        on_transition: -> { $next_scene = Scenes::Gameplay.new(args, stage_number: args.state.stage_number) }
       )
     else
       args.state.game_over = true
@@ -435,7 +438,6 @@ def render_ui(args)
     r: 255, g: 255, b: 255,
     font: 'fonts/m6x11plus.ttf'
   }
-  args.outputs.primitives << args.state.screen_overlays
 end
 
 def game_over_screen(args)
