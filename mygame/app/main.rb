@@ -483,3 +483,7 @@ end
 def add_animation(args, animation_attributes)
   args.state.animations << Animation.build(animation_attributes)
 end
+
+def build_label(values)
+  values.merge(font: 'fonts/m6x11plus.ttf', size_px: values[:size] * 6)
+end

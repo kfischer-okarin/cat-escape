@@ -4,14 +4,21 @@ module Scenes
 
     def tick(args)
       args.outputs.background_color = BG_COLOR
-      x = 270
-      y = 300
+      x = 250
+      y = 350
       args.outputs.primitives << {
         x: x, y: y, w: 346 * 2, h: 137 * 2,
         path: 'sprites/title-without-eyes.png'
       }
 
       render_blinking_eyes(args, x, y)
+
+      args.outputs.primitives << build_label(
+        text: 'Press Space to Start',
+        x: 640, y: 150, size: 10,
+        alignment_enum: 1,
+        r: 114, g: 48, b: 14
+      )
     end
 
     private
