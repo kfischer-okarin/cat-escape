@@ -45,6 +45,7 @@ STAGES = [
 $gtk.reset
 
 COLORS = {
+  title_background: { r: 251, g: 225, b: 190 },
   black: { r: 0, g: 0, b: 0 },
   orange: { r: 223, g: 113, b: 38 },
   white: { r: 255, g: 255, b: 255 },

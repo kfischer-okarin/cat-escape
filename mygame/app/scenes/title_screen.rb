@@ -1,9 +1,7 @@
 module Scenes
   class TitleScreen
-    BG_COLOR = { r: 251, g: 225, b: 190 }.freeze
-
     def tick(args)
-      args.outputs.background_color = BG_COLOR
+      args.outputs.background_color = COLORS[:title_background]
       x = 250
       y = 350
       args.outputs.primitives << {
