@@ -4,7 +4,9 @@ module Scenes
       args.state.stage_number = stage_number
       args.state.stage = prepare_stage(STAGES[stage_number])
       args.state.current_cat = 0
-      args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true, gain: 0.3 }
+      unless args.audio[:bgm] && args.audio[:bgm][:input] == 'audio/Wholesome.ogg'
+        args.audio[:bgm] = { input: 'audio/Wholesome.ogg', looping: true, gain: 0.3 }
+      end
       args.state.game_over = false
     end
 
