@@ -1,4 +1,5 @@
 require 'app/animation'
+require 'app/debug'
 require 'app/movement'
 require 'app/scenes/gameplay'
 require 'app/scenes/title_screen'
@@ -106,13 +107,15 @@ def tick(args)
 
   args.outputs.primitives << args.state.screen_overlays
 
-  args.outputs.debug << "FPS: #{args.gtk.current_framerate}"
+  $debug.toggle_debug_mode if args.inputs.keyboard.key_down.f1
+  $debug.log "FPS: #{args.gtk.current_framerate}"
 end
 
 def setup(args)
   args.state.animations = []
   args.state.screen_overlays = []
   $scene = Scenes::TitleScreen.new
+  $debug = Debug.new(args)
 end
 
 def process_input(args)
