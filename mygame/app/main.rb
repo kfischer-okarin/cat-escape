@@ -47,10 +47,13 @@ $gtk.reset
 COLORS = {
   title_background: { r: 0xfe, g: 0xe1, b: 0xbe },
   title_text: { r: 0x72, g: 0x30, b: 0x0e },
+  stage_background: { r: 0x64, g: 0x64, b: 0x64 },
+  ui_text: { r: 0xff, g: 0xff, b: 0xff },
   black: { r: 0, g: 0, b: 0 },
   orange: { r: 223, g: 113, b: 38 },
   white: { r: 255, g: 255, b: 255 },
-  gray: { r: 100, g: 100, b: 100 }
+  gray: { r: 0x64, g: 0x64, b: 0x64 },
+  yellow: { r: 0xff, g: 0xff, b: 0 }
 }.transform_values(&:freeze).freeze
 
 # "Wholesome" Kevin MacLeod (incompetech.com)
@@ -336,7 +339,7 @@ def prepare_stage(stage)
 end
 
 def render_stage(args, stage)
-  args.outputs.background_color = { r: 100, g: 100, b: 100 }
+  args.outputs.background_color = COLORS[:stage_background]
   args.outputs.primitives << stage[:sprites]
   args.outputs.primitives << stage[:objects].map { |object|
     {
@@ -348,7 +351,7 @@ def render_stage(args, stage)
     }
   }
   args.outputs.primitives << stage[:cats].map_with_index { |cat, index|
-    color = index == args.state.current_cat ? COLORS[:white] : COLORS[:gray]
+    color = index == args.state.current_cat ? {} : COLORS[:gray]
     {
       x: (cat[:x] * CELL_SIZE) + stage[:offset_x] + cat[:sprite_offset_x],
       y: (cat[:y] * CELL_SIZE) + stage[:offset_y] + cat[:sprite_offset_y],
@@ -369,7 +372,7 @@ CELL_TYPE_SYMBOLS = {
 def cell_sprite(cell_type)
   case cell_type
   when :wall
-    { path: :pixel, r: 100, g: 100, b: 100 }
+    { path: :pixel, **COLORS[:stage_background] }
   else
     { path: 'sprites/ground_06.png' }
   end
@@ -386,7 +389,7 @@ def object_sprite(object)
   when :box
     { path: 'sprites/crate_42.png' }
   when :exit
-    { path: 'sprites/flag_square.png', r: 255, g: 255, b: 0 }
+    { path: 'sprites/flag_square.png', **COLORS[:yellow] }
   end
 end
 
@@ -432,14 +435,13 @@ def render_ui(args)
     h: 64,
     path: 'sprites/keyboard_r.png'
   }
-  args.outputs.primitives << {
+  args.outputs.primitives << build_label(
     x: 64,
     y: 706,
     text: 'Restart',
-    size_px: 36,
-    r: 255, g: 255, b: 255,
-    font: 'fonts/m6x11plus.ttf'
-  }
+    size: 6,
+    **COLORS[:ui_text]
+  )
 end
 
 def game_over_screen(args)
@@ -475,16 +477,15 @@ def game_over_screen(args)
     }
   end
 
-  args.outputs.primitives << {
+  args.outputs.primitives << build_label(
     x: 640,
     y: 360,
     anchor_x: 0.5,
     anchor_y: 0.5,
     text: 'Congratulations!',
-    size_px: 60,
-    r: 255, g: 255, b: 255,
-    font: 'fonts/m6x11plus.ttf'
-  }
+    size: 10,
+    **COLORS[:ui_text]
+  )
 end
 
 def cat_sprite(cat, cat_index)
