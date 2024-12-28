@@ -15,7 +15,7 @@ module Scenes
         text: 'Press Space to Start',
         x: 640, y: 150, size: 10,
         alignment_enum: 1,
-        r: 114, g: 48, b: 14
+        **COLORS[:title_text]
       )
       return unless args.inputs.keyboard.key_down.space
 
